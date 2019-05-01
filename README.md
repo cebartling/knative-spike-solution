@@ -10,7 +10,7 @@ Following https://github.com/knative/docs/blob/master/docs/install/Knative-with-
 
     https://libvirt.org/
 
-1. Enable and start the JVM2 hypervisor:    
+1. Enable and start the KVM2 hypervisor:    
 
     ```bash
     sudo systemctl enable libvirtd.service
