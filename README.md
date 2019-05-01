@@ -183,9 +183,31 @@ kube-system        kubernetes-dashboard-79dd6bfc48-z5rzr           1/1     Runni
 kube-system        storage-provisioner                             1/1     Running   0          17m
 ```
 
+## Initialize namespace on DockerHub
+
+Use the riff CLI to initialize your namespace (if you plan on using a namespace other than default then substitute the name you want to use). This will create a serviceaccount and a secret with the provided credentials and install a buildtemplate. Replace *superduperdev* with your DockerHub username.
+
+```bash
+export DOCKER_ID=superduperdev
+riff namespace init hp-devdays --docker-hub $DOCKER_ID
+```
+
+You will be prompted to provide the password.
+
+```bash
+Initializing namespace "hp-devdays"
+
+Creating namespace "hp-devdays" 
+Enter password for user "superduperdev"
+Creating secret "push-credentials" with basic authentication to server "https://index.docker.io/v1/" for user "superduperdev"
+Creating serviceaccount "riff-build" using secret "push-credentials" in namespace "hp-devdays"
+Setting default image prefix to "docker.io/superduperdev" for namespace "hp-devdays"
+
+riff namespace init completed successfully
+```
 
 
-
+`riff function create square --git-repo https://github.com/projectriff-samples/node-square --artifact square.js --verbose --image hp-devdays/square:0.0.1`
 
 
 
@@ -209,216 +231,3 @@ Opening in existing browser session.
 💔  The "minikube" cluster has been deleted.
 ```
 
-## Installing Knative
-
-*CRD*: Custom resource definition
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://github.com/knative/serving/releases/download/v0.5.2/serving.yaml`
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://github.com/knative/build/releases/download/v0.5.0/build.yaml`
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://github.com/knative/eventing/releases/download/v0.5.0/release.yaml`
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://github.com/knative/eventing-sources/releases/download/v0.5.0/eventing-sources.yaml`
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://github.com/knative/serving/releases/download/v0.5.2/monitoring.yaml`
-
-`kubectl apply --selector knative.dev/crd-install=true --filename https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/config/build/clusterrole.yaml`
-
-
-
-
-
-```bash
-kubectl apply --filename https://github.com/knative/serving/releases/download/v0.5.2/serving.yaml \
---filename https://github.com/knative/build/releases/download/v0.5.0/build.yaml \
---filename https://github.com/knative/eventing/releases/download/v0.5.0/release.yaml \
---filename https://github.com/knative/eventing-sources/releases/download/v0.5.0/eventing-sources.yaml \
---filename https://github.com/knative/serving/releases/download/v0.5.2/monitoring.yaml \
---filename https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/config/build/clusterrole.yaml
-```
-
-```bash
-namespace/knative-serving created
-clusterrole.rbac.authorization.k8s.io/knative-serving-admin created
-clusterrole.rbac.authorization.k8s.io/knative-serving-core created
-clusterrole.rbac.authorization.k8s.io/knative-serving-istio created
-serviceaccount/controller created
-clusterrolebinding.rbac.authorization.k8s.io/knative-serving-controller-admin created
-gateway.networking.istio.io/knative-ingress-gateway created
-gateway.networking.istio.io/cluster-local-gateway created
-customresourcedefinition.apiextensions.k8s.io/certificates.networking.internal.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/clusteringresses.networking.internal.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/configurations.serving.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/images.caching.internal.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/podautoscalers.autoscaling.internal.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/revisions.serving.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/routes.serving.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/services.serving.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/serverlessservices.networking.internal.knative.dev unchanged
-service/activator-service created
-service/controller created
-service/webhook created
-image.caching.internal.knative.dev/queue-proxy created
-deployment.apps/activator created
-service/autoscaler created
-deployment.apps/autoscaler created
-configmap/config-autoscaler created
-configmap/config-controller created
-configmap/config-defaults created
-configmap/config-domain created
-configmap/config-gc created
-configmap/config-istio created
-configmap/config-logging created
-configmap/config-network created
-configmap/config-observability created
-deployment.apps/controller created
-deployment.apps/webhook created
-namespace/knative-build created
-podsecuritypolicy.policy/knative-build created
-clusterrole.rbac.authorization.k8s.io/knative-build-admin created
-serviceaccount/build-controller created
-clusterrolebinding.rbac.authorization.k8s.io/build-controller-admin created
-customresourcedefinition.apiextensions.k8s.io/builds.build.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/buildtemplates.build.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/clusterbuildtemplates.build.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/images.caching.internal.knative.dev configured
-service/build-controller created
-service/build-webhook created
-image.caching.internal.knative.dev/creds-init created
-image.caching.internal.knative.dev/git-init created
-image.caching.internal.knative.dev/gcs-fetcher created
-image.caching.internal.knative.dev/nop created
-configmap/config-logging created
-deployment.apps/build-controller created
-deployment.apps/build-webhook created
-namespace/knative-eventing created
-clusterrole.rbac.authorization.k8s.io/addressable-resolver created
-clusterrole.rbac.authorization.k8s.io/serving-addressable-resolver created
-clusterrole.rbac.authorization.k8s.io/channel-addressable-resolver created
-clusterrole.rbac.authorization.k8s.io/broker-addressable-resolver created
-clusterrole.rbac.authorization.k8s.io/eventing-broker-filter created
-clusterrole.rbac.authorization.k8s.io/knative-eventing-controller created
-serviceaccount/eventing-controller created
-serviceaccount/eventing-webhook created
-clusterrole.rbac.authorization.k8s.io/knative-eventing-webhook created
-clusterrolebinding.rbac.authorization.k8s.io/eventing-controller created
-clusterrolebinding.rbac.authorization.k8s.io/eventing-controller-resolver created
-clusterrolebinding.rbac.authorization.k8s.io/eventing-webhook created
-customresourcedefinition.apiextensions.k8s.io/brokers.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/channels.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/clusterchannelprovisioners.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/subscriptions.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/triggers.eventing.knative.dev unchanged
-configmap/default-channel-webhook created
-service/webhook created
-deployment.apps/eventing-controller created
-deployment.apps/webhook created
-configmap/config-logging created
-clusterchannelprovisioner.eventing.knative.dev/in-memory created
-clusterchannelprovisioner.eventing.knative.dev/in-memory-channel created
-serviceaccount/in-memory-channel-controller created
-clusterrole.rbac.authorization.k8s.io/in-memory-channel-controller created
-clusterrolebinding.rbac.authorization.k8s.io/in-memory-channel-controller created
-deployment.apps/in-memory-channel-controller created
-serviceaccount/in-memory-channel-dispatcher created
-clusterrole.rbac.authorization.k8s.io/in-memory-channel-dispatcher created
-clusterrolebinding.rbac.authorization.k8s.io/in-memory-channel-dispatcher created
-deployment.apps/in-memory-channel-dispatcher created
-configmap/in-memory-channel-dispatcher-config-map created
-namespace/knative-sources created
-serviceaccount/controller-manager created
-clusterrole.rbac.authorization.k8s.io/eventing-sources-controller created
-clusterrolebinding.rbac.authorization.k8s.io/eventing-sources-controller created
-customresourcedefinition.apiextensions.k8s.io/awssqssources.sources.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/containersources.sources.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/cronjobsources.sources.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/githubsources.sources.eventing.knative.dev unchanged
-customresourcedefinition.apiextensions.k8s.io/kuberneteseventsources.sources.eventing.knative.dev unchanged
-service/controller created
-statefulset.apps/controller-manager created
-namespace/knative-monitoring created
-service/elasticsearch-logging created
-serviceaccount/elasticsearch-logging created
-clusterrole.rbac.authorization.k8s.io/elasticsearch-logging created
-clusterrolebinding.rbac.authorization.k8s.io/elasticsearch-logging created
-statefulset.apps/elasticsearch-logging created
-service/kibana-logging created
-deployment.apps/kibana-logging created
-configmap/fluentd-ds-config created
-logentry.config.istio.io/requestlog created
-fluentd.config.istio.io/requestloghandler created
-rule.config.istio.io/requestlogtofluentd created
-serviceaccount/fluentd-ds created
-clusterrole.rbac.authorization.k8s.io/fluentd-ds created
-clusterrolebinding.rbac.authorization.k8s.io/fluentd-ds created
-service/fluentd-ds created
-daemonset.apps/fluentd-ds created
-configmap/grafana-dashboard-definition-istio created
-configmap/grafana-dashboard-definition-mixer created
-configmap/grafana-dashboard-definition-pilot created
-serviceaccount/kube-state-metrics created
-role.rbac.authorization.k8s.io/kube-state-metrics-resizer created
-rolebinding.rbac.authorization.k8s.io/kube-state-metrics created
-clusterrole.rbac.authorization.k8s.io/kube-state-metrics created
-clusterrolebinding.rbac.authorization.k8s.io/kube-state-metrics created
-deployment.extensions/kube-state-metrics created
-service/kube-state-metrics created
-configmap/grafana-dashboard-definition-kubernetes-deployment created
-configmap/grafana-dashboard-definition-kubernetes-capacity-planning created
-configmap/grafana-dashboard-definition-kubernetes-cluster-health created
-configmap/grafana-dashboard-definition-kubernetes-cluster-status created
-configmap/grafana-dashboard-definition-kubernetes-control-plane-status created
-configmap/grafana-dashboard-definition-kubernetes-resource-requests created
-configmap/grafana-dashboard-definition-kubernetes-nodes created
-configmap/grafana-dashboard-definition-kubernetes-pods created
-configmap/grafana-dashboard-definition-kubernetes-statefulset created
-serviceaccount/node-exporter created
-clusterrole.rbac.authorization.k8s.io/node-exporter created
-clusterrolebinding.rbac.authorization.k8s.io/node-exporter created
-daemonset.extensions/node-exporter created
-service/node-exporter created
-configmap/grafana-dashboard-definition-knative-efficiency created
-configmap/grafana-dashboard-definition-knative-reconciler created
-configmap/scaling-config created
-configmap/grafana-dashboard-definition-knative created
-configmap/grafana-datasources created
-configmap/grafana-dashboards created
-service/grafana created
-deployment.apps/grafana created
-metric.config.istio.io/revisionrequestcount created
-metric.config.istio.io/revisionrequestduration created
-metric.config.istio.io/revisionrequestsize created
-metric.config.istio.io/revisionresponsesize created
-prometheus.config.istio.io/revisionpromhandler created
-rule.config.istio.io/revisionpromhttp created
-configmap/prometheus-scrape-config created
-service/kube-controller-manager created
-service/prometheus-system-discovery created
-serviceaccount/prometheus-system created
-role.rbac.authorization.k8s.io/prometheus-system created
-role.rbac.authorization.k8s.io/prometheus-system created
-role.rbac.authorization.k8s.io/prometheus-system created
-role.rbac.authorization.k8s.io/prometheus-system created
-clusterrole.rbac.authorization.k8s.io/prometheus-system created
-rolebinding.rbac.authorization.k8s.io/prometheus-system created
-rolebinding.rbac.authorization.k8s.io/prometheus-system created
-rolebinding.rbac.authorization.k8s.io/prometheus-system created
-rolebinding.rbac.authorization.k8s.io/prometheus-system created
-clusterrolebinding.rbac.authorization.k8s.io/prometheus-system created
-service/prometheus-system-np created
-statefulset.apps/prometheus-system created
-service/zipkin created
-deployment.apps/zipkin created
-clusterrole.rbac.authorization.k8s.io/knative-serving-build created
-```
-
-### Monitor Knative components
-
-```bash
-kubectl get pods --namespace knative-serving
-kubectl get pods --namespace knative-build
-kubectl get pods --namespace knative-eventing
-kubectl get pods --namespace knative-sources
-kubectl get pods --namespace knative-monitoring
-```
