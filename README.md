@@ -2,6 +2,9 @@
 
 Following https://github.com/knative/docs/blob/master/docs/install/Knative-with-Minikube.md 
 
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+
+
 ## Getting up and running
 
 1. Install `kubectl`. We're using the `kubectl` from the Google Cloud SDK. More information on kubectl at https://kubernetes.io/docs/reference/kubectl/overview/.
@@ -83,249 +86,107 @@ Following https://github.com/knative/docs/blob/master/docs/install/Knative-with-
 1. Delete the factory-installed minikube configuration: `minikube delete` 
 
 
-## Create Kubernetes cluster
+## Create minikube cluster
 
-`minikube start --memory=8192 --cpus=4 --kubernetes-version=v1.14.1 --vm-driver=kvm2 --disk-size=30g --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"`
+`minikube start --memory=8192 --cpus=4 --kubernetes-version=v1.14.1 --vm-driver=kvm2 --disk-size=30g --bootstrapper=kubeadm --extra-config=apiserver.enable-admission-plugins="LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook"`
 
 ```bash
 😄  minikube v1.0.1 on linux (amd64)
-💥  Kubernetes downgrade is not supported, will continue to use v1.14.1
 🤹  Downloading Kubernetes v1.14.1 images in the background ...
-💡  Tip: Use 'minikube start -p <name>' to create a new cluster, or 'minikube delete' to delete this one.
-🔄  Restarting existing kvm2 VM for "minikube" ...
-⌛  Waiting for SSH access ...
-📶  "minikube" IP address is 192.168.39.3
+🔥  Creating kvm2 VM (CPUs=4, Memory=8192MB, Disk=30000MB) ...
+📶  "minikube" IP address is 192.168.39.119
 🐳  Configuring Docker as the container runtime ...
 🐳  Version of container runtime is 18.06.3-ce
 ⌛  Waiting for image downloads to complete ...
 ✨  Preparing Kubernetes environment ...
     ▪ apiserver.enable-admission-plugins=LimitRanger,NamespaceExists,NamespaceLifecycle,ResourceQuota,ServiceAccount,DefaultStorageClass,MutatingAdmissionWebhook
 🚜  Pulling images required by Kubernetes v1.14.1 ...
-🔄  Relaunching Kubernetes v1.14.1 using kubeadm ... 
+🚀  Launching Kubernetes v1.14.1 using kubeadm ... 
 ⌛  Waiting for pods: apiserver proxy etcd scheduler controller dns
-📯  Updating kube-proxy configuration ...
+🔑  Configuring cluster permissions ...
 🤔  Verifying component health .....
 💗  kubectl is now configured to use "minikube"
 🏄  Done! Thank you for using minikube!
 ```
 
-## Install Istio
+Ensure kubectl context is pointing at this new cluster: `kubectl config current-context`
 
-1. `kubectl apply --filename https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/istio-1.0.7/istio-crds.yaml && curl -L https://raw.githubusercontent.com/knative/serving/v0.5.2/third_party/istio-1.0.7/istio.yaml | sed 's/LoadBalancer/NodePort/' | kubectl apply --filename -`
-
-```bash
-customresourcedefinition.apiextensions.k8s.io/virtualservices.networking.istio.io created
-customresourcedefinition.apiextensions.k8s.io/destinationrules.networking.istio.io created
-customresourcedefinition.apiextensions.k8s.io/serviceentries.networking.istio.io created
-customresourcedefinition.apiextensions.k8s.io/gateways.networking.istio.io created
-customresourcedefinition.apiextensions.k8s.io/envoyfilters.networking.istio.io created
-customresourcedefinition.apiextensions.k8s.io/policies.authentication.istio.io created
-customresourcedefinition.apiextensions.k8s.io/meshpolicies.authentication.istio.io created
-customresourcedefinition.apiextensions.k8s.io/httpapispecbindings.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/httpapispecs.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/quotaspecbindings.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/quotaspecs.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/rules.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/attributemanifests.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/bypasses.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/circonuses.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/deniers.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/fluentds.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/kubernetesenvs.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/listcheckers.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/memquotas.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/noops.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/opas.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/prometheuses.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/rbacs.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/redisquotas.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/servicecontrols.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/signalfxs.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/solarwindses.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/stackdrivers.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/statsds.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/stdios.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/apikeys.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/authorizations.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/checknothings.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/kuberneteses.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/listentries.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/logentries.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/edges.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/metrics.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/quotas.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/reportnothings.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/servicecontrolreports.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/tracespans.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/rbacconfigs.rbac.istio.io created
-customresourcedefinition.apiextensions.k8s.io/serviceroles.rbac.istio.io created
-customresourcedefinition.apiextensions.k8s.io/servicerolebindings.rbac.istio.io created
-customresourcedefinition.apiextensions.k8s.io/adapters.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/instances.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/templates.config.istio.io created
-customresourcedefinition.apiextensions.k8s.io/handlers.config.istio.io created
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0namespace/istio-system created
-configmap/istio-galley-configuration created
-configmap/istio-statsd-prom-bridge created
-configmap/istio-security-custom-resources created
-configmap/istio created
-configmap/istio-sidecar-injector created
-serviceaccount/istio-galley-service-account created
-serviceaccount/istio-egressgateway-service-account created
-100  116k  100  116k    0     0   166k      0 --:--:-- --:--:-- --:--:--  166k
-serviceaccount/istio-ingressgateway-service-account created
-serviceaccount/istio-mixer-service-account created
-serviceaccount/istio-pilot-service-account created
-serviceaccount/istio-cleanup-secrets-service-account created
-clusterrole.rbac.authorization.k8s.io/istio-cleanup-secrets-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-cleanup-secrets-istio-system created
-job.batch/istio-cleanup-secrets created
-serviceaccount/istio-security-post-install-account created
-clusterrole.rbac.authorization.k8s.io/istio-security-post-install-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-security-post-install-role-binding-istio-system created
-job.batch/istio-security-post-install created
-serviceaccount/istio-citadel-service-account created
-serviceaccount/istio-sidecar-injector-service-account created
-customresourcedefinition.apiextensions.k8s.io/virtualservices.networking.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/destinationrules.networking.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/serviceentries.networking.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/gateways.networking.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/envoyfilters.networking.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/httpapispecbindings.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/httpapispecs.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/quotaspecbindings.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/quotaspecs.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/rules.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/attributemanifests.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/bypasses.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/circonuses.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/deniers.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/fluentds.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/kubernetesenvs.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/listcheckers.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/memquotas.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/noops.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/opas.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/prometheuses.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/rbacs.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/redisquotas.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/servicecontrols.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/signalfxs.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/solarwindses.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/stackdrivers.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/statsds.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/stdios.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/apikeys.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/authorizations.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/checknothings.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/kuberneteses.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/listentries.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/logentries.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/edges.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/metrics.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/quotas.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/reportnothings.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/servicecontrolreports.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/tracespans.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/rbacconfigs.rbac.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/serviceroles.rbac.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/servicerolebindings.rbac.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/adapters.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/instances.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/templates.config.istio.io unchanged
-customresourcedefinition.apiextensions.k8s.io/handlers.config.istio.io unchanged
-clusterrole.rbac.authorization.k8s.io/istio-galley-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-egressgateway-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-ingressgateway-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-mixer-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-pilot-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-citadel-istio-system created
-clusterrole.rbac.authorization.k8s.io/istio-sidecar-injector-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-galley-admin-role-binding-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-egressgateway-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-ingressgateway-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-mixer-admin-role-binding-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-pilot-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-citadel-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/istio-sidecar-injector-admin-role-binding-istio-system created
-service/istio-galley created
-service/istio-egressgateway created
-service/istio-ingressgateway created
-service/istio-policy created
-service/istio-telemetry created
-service/istio-pilot created
-service/istio-citadel created
-service/istio-sidecar-injector created
-deployment.extensions/istio-galley created
-deployment.extensions/istio-egressgateway created
-deployment.extensions/istio-ingressgateway created
-deployment.extensions/istio-policy created
-deployment.extensions/istio-telemetry created
-deployment.extensions/istio-pilot created
-deployment.extensions/istio-citadel created
-deployment.extensions/istio-sidecar-injector created
-gateway.networking.istio.io/istio-autogenerated-k8s-ingress created
-horizontalpodautoscaler.autoscaling/istio-egressgateway created
-horizontalpodautoscaler.autoscaling/istio-ingressgateway created
-horizontalpodautoscaler.autoscaling/istio-policy created
-horizontalpodautoscaler.autoscaling/istio-telemetry created
-horizontalpodautoscaler.autoscaling/istio-pilot created
-mutatingwebhookconfiguration.admissionregistration.k8s.io/istio-sidecar-injector created
-attributemanifest.config.istio.io/istioproxy created
-attributemanifest.config.istio.io/kubernetes created
-stdio.config.istio.io/handler created
-logentry.config.istio.io/accesslog created
-logentry.config.istio.io/tcpaccesslog created
-rule.config.istio.io/stdio created
-rule.config.istio.io/stdiotcp created
-metric.config.istio.io/requestcount created
-metric.config.istio.io/requestduration created
-metric.config.istio.io/requestsize created
-metric.config.istio.io/responsesize created
-metric.config.istio.io/tcpbytesent created
-metric.config.istio.io/tcpbytereceived created
-prometheus.config.istio.io/handler created
-rule.config.istio.io/promhttp created
-rule.config.istio.io/promtcp created
-kubernetesenv.config.istio.io/handler created
-rule.config.istio.io/kubeattrgenrulerule created
-rule.config.istio.io/tcpkubeattrgenrulerule created
-kubernetes.config.istio.io/attributes created
-destinationrule.networking.istio.io/istio-policy created
-destinationrule.networking.istio.io/istio-telemetry created
-serviceaccount/cluster-local-gateway-service-account created
-clusterrole.rbac.authorization.k8s.io/cluster-local-gateway-istio-system created
-clusterrolebinding.rbac.authorization.k8s.io/cluster-local-gateway-istio-system created
-service/cluster-local-gateway created
-deployment.extensions/cluster-local-gateway created
-horizontalpodautoscaler.autoscaling/cluster-local-gateway created
-```
-
-`kubectl label namespace default istio-injection=enabled`
-
-## Get the status of the pods in the istio-system namespace 
-
-`kubectl get pods --namespace istio-system`
+## Install riff
 
 ```bash
-✗ kubectl get pods --namespace istio-system
-NAME                                      READY   STATUS      RESTARTS   AGE
-cluster-local-gateway-5bf5488bb-xfljk     1/1     Running     0          4m45s
-istio-citadel-78fd647cf-nm7rl             1/1     Running     0          4m46s
-istio-cleanup-secrets-k9q47               0/1     Completed   0          4m47s
-istio-egressgateway-5547468b8d-d9jbr      1/1     Running     0          4m46s
-istio-galley-64ddbbff8b-p72sx             1/1     Running     0          4m46s
-istio-ingressgateway-686d54b4bf-5z749     1/1     Running     0          4m46s
-istio-pilot-7bd454bf5c-fxbgq              2/2     Running     0          4m46s
-istio-pilot-7bd454bf5c-wdcls              2/2     Running     0          4m30s
-istio-pilot-7bd454bf5c-z5srh              2/2     Running     0          4m30s
-istio-policy-64b5ff6bd8-dtvst             2/2     Running     0          4m46s
-istio-security-post-install-jrr4t         0/1     Completed   0          4m47s
-istio-sidecar-injector-6956c47586-p4brc   1/1     Running     0          4m46s
-istio-telemetry-55b97c59c4-wr4k6          2/2     Running     0          4m46s
+curl -Lo riff-linux-amd64.tgz https://github.com/projectriff/riff/releases/download/v0.3.0/riff-linux-amd64.tgz
+tar xvzf riff-linux-amd64.tgz
+sudo mv riff /usr/local/bin/
 ```
+
+## Install Knative and Istio via riff CLI
+
+Install Knative, watching the pods until everything is running (this could take a couple of minutes). The `--node-port` option replaces *LoadBalancer* type services with *NodePort*.
+
+`riff system install --node-port`
+
+```bash
+Installing Istio components
+Applying resources defined in: https://storage.googleapis.com/projectriff/istio/istio-v1.0.7-riff.yaml
+Istio components installed
+
+Waiting for the Istio components to start ......... all components are 'Running'
+
+Installing Knative components
+Applying resources defined in: https://storage.googleapis.com/knative-releases/build/previous/v0.5.0/build.yaml
+Applying resources defined in: https://storage.googleapis.com/knative-releases/serving/previous/v0.5.0/serving.yaml
+Applying resources defined in: https://raw.githubusercontent.com/knative/serving/v0.5.0/third_party/config/build/clusterrole.yaml
+Applying resources defined in: https://storage.googleapis.com/knative-releases/eventing/previous/v0.4.0/eventing.yaml
+Applying resources defined in: https://storage.googleapis.com/knative-releases/eventing/previous/v0.4.0/in-memory-channel.yaml
+Applying resources defined in: https://storage.googleapis.com/projectriff/riff-buildtemplate/riff-cnb-clusterbuildtemplate-0.2.0.yaml
+Knative components installed
+
+
+riff system install completed successfully
+```
+
+## Get the status of all the pods across namespaces 
+
+`kubectl get pods --all-namespaces`
+
+```bash
+kubectl get pods --all-namespaces              
+NAMESPACE          NAME                                            READY   STATUS    RESTARTS   AGE
+istio-system       cluster-local-gateway-5bf5488bb-vnb2d           1/1     Running   0          10m
+istio-system       istio-citadel-78fd647cf-q79sj                   1/1     Running   0          10m
+istio-system       istio-egressgateway-5547468b8d-5k8dt            1/1     Running   0          10m
+istio-system       istio-galley-64ddbbff8b-2k6xl                   1/1     Running   0          10m
+istio-system       istio-ingressgateway-686d54b4bf-fvf4q           1/1     Running   0          10m
+istio-system       istio-pilot-7c86c7cb8b-x5trh                    2/2     Running   0          10m
+istio-system       istio-policy-64b5ff6bd8-x5xbf                   2/2     Running   0          10m
+istio-system       istio-sidecar-injector-6956c47586-tcncp         1/1     Running   0          10m
+istio-system       istio-telemetry-55b97c59c4-cb2xn                2/2     Running   0          10m
+knative-build      build-controller-77cbbc9888-h8frg               1/1     Running   0          8m38s
+knative-build      build-webhook-64f9bbc7c9-ckbkc                  1/1     Running   0          8m38s
+knative-eventing   eventing-controller-8b87fcbb5-h8c4z             1/1     Running   0          8m36s
+knative-eventing   in-memory-channel-controller-c48986657-x6mxz    1/1     Running   0          8m35s
+knative-eventing   in-memory-channel-dispatcher-5f68fff98d-zcchl   2/2     Running   1          8m35s
+knative-eventing   webhook-6dc88dbfb4-v89br                        1/1     Running   0          8m36s
+knative-serving    activator-654b696b84-cw4wp                      2/2     Running   0          8m37s
+knative-serving    autoscaler-585b674986-cjqvq                     2/2     Running   0          8m37s
+knative-serving    controller-54b89c944c-p2tww                     1/1     Running   0          8m37s
+knative-serving    webhook-5cc857b9b8-qf4bv                        1/1     Running   0          8m37s
+kube-system        coredns-fb8b8dccf-5mh52                         1/1     Running   1          17m
+kube-system        coredns-fb8b8dccf-ctqww                         1/1     Running   1          17m
+kube-system        etcd-minikube                                   1/1     Running   0          16m
+kube-system        kube-addon-manager-minikube                     1/1     Running   0          16m
+kube-system        kube-apiserver-minikube                         1/1     Running   0          16m
+kube-system        kube-controller-manager-minikube                1/1     Running   0          16m
+kube-system        kube-proxy-jprqh                                1/1     Running   0          17m
+kube-system        kube-scheduler-minikube                         1/1     Running   0          16m
+kube-system        kubernetes-dashboard-79dd6bfc48-z5rzr           1/1     Running   4          17m
+kube-system        storage-provisioner                             1/1     Running   0          17m
+```
+
+
+
+
+
 
 
 ## minikube dashboard
