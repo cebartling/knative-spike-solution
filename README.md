@@ -4,6 +4,8 @@ Following https://github.com/knative/docs/blob/master/docs/install/Knative-with-
 
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+https://www.youtube.com/watch?v=tOH14vXQR2I
+
 
 ## Getting up and running
 
@@ -194,6 +196,7 @@ riff namespace init hp-devdays --docker-hub $DOCKER_ID
 
 You will be prompted to provide the password.
 
+
 ```bash
 Initializing namespace "hp-devdays"
 
@@ -206,8 +209,13 @@ Setting default image prefix to "docker.io/superduperdev" for namespace "hp-devd
 riff namespace init completed successfully
 ```
 
+### Create new service from function
 
-`riff function create square --git-repo https://github.com/projectriff-samples/node-square --artifact square.js --verbose --image hp-devdays/square:0.0.1`
+`riff function create square --git-repo https://github.com/projectriff-samples/node-square --artifact square.js --image hp-devdays/square --namespace hp-devdays --verbose`
+
+### Remove existing service from namespace
+
+`riff service delete square --namespace hp-devdays`
 
 
 
