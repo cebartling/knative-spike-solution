@@ -1,0 +1,19 @@
+apiVersion: serving.knative.dev/v1alpha1
+kind: Service
+metadata:
+  name: helloworld
+spec:
+  ports:
+    - nodePort: 0
+      port: 80
+      protocol: TCF
+      targetPort: 80
+  runLatest:
+    configuration:
+      revisionTemplate:
+        spec:
+          container:
+            image: docker-registry.default.svc:5000/knative-serving/helloworld
+            env:
+              - name: TARGET
+                value: "Chris Bartling and Roland Rutkowski at HealthPartners"
