@@ -6,8 +6,8 @@ spec:
   ports:
     - nodePort: 0
       port: 80
-      protocol: TCF
       targetPort: 80
+      protocol: TCP
   runLatest:
     configuration:
       revisionTemplate:
